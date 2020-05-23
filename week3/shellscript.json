@@ -1,0 +1,49 @@
+{
+	// Place your snippets for shellscript here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+
+	"Add Shebang": {
+		"scope": "sh",   //any file that ends in sh
+		"prefix": "shebang",  //as shebang is typed it will offer to add the body
+		"body": [
+			"#!/bin/bash",    //this is added
+		],
+		"description": "Adds Shebang Script Head"}
+
+		"Add green": {
+			"scope": "sh",   //any file that ends in sh
+			"prefix": "green",  //as shebang is typed it will offer to add the body
+			"body": [
+				"echo -e \"\\e[32m{enter text here}\\e[0m\"",    //this is added
+			],
+			"description": "Adds green"}
+
+		"Add red": {
+			"scope": "sh",   //any file that ends in sh
+			"prefix": "red",  //as shebang is typed it will offer to add the body
+			"body": [
+				"echo -e \"\\e[31m{enter text here}\\e[0m\"",    //this is added
+			],
+			"description": "Adds red"}
+		"Add blue": {
+			"scope": "sh",   //any file that ends in sh
+			"prefix": "blue",  //as shebang is typed it will offer to add the body
+			"body": [
+				"echo -e \"\\e[34m{enter text here}\\e[0m\"",    //this is added
+			],
+			"description": "Adds blue"}	
+
+	}	
+
+}
