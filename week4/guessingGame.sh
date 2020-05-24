@@ -12,9 +12,9 @@
      while [ "$REPLY" != 42 ]
      do
         read -p "$1: "
-        if [ "$REPLY" == 42 ]; then echo "Correct"
-        elif [ "$REPLY" -lt "42" ]; then echo "Too Low"
-        else echo "Too high"
+        if [ "$REPLY" == 42 ]; then echo "Right!"
+        elif [ "$REPLY" -lt "42" ]; then echo "Too Low!"
+        else echo "Too high!"
         fi
     done
 
