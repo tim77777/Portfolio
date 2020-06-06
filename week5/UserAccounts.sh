@@ -1,4 +1,8 @@
 #!/bin/bash
+#script structres parts of /etc/passwd into columns. Colors are used
+#the /bash/ line ensures that only those accounts using the bash shell are listed
+#FS is a delimiting character
+#$1, $3, $4, $6, $7 denote the files within passwd that are displayed
 
 awk 'BEGIN{ 
      FS=":"; 
