@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #!/bin/bash 
 #The script takes a hardcoded selection of html data from www.cyber.gov.au, converts it to text for later searching and stores both the downloaded html and 
 #converted text files. An option is provided to search the converted text files for string matches such as “DDoS” and “threat actor”. When a match is 
@@ -9,6 +10,17 @@
 
 #function 'getWebLInks' takes in URLs from a file and displays them, formatted with space, borders and colors
 #$searchString holds the phrase being searched for and LInks2 contains the URLs to which matches were found 
+=======
+#!/bin/bash
+#One part of script scrapes a selection of HTML data from www.cyber.gov.au, converts it to text and stores it
+#Second part of script requires prior downloading of webpages, and prior html to text translation of those pages as done by part one
+#Second part of the script searches for matches between an entered word and prior downloaded files, displays those filenames and the URLS those filenames can be found on.
+#Displays how frequently matches were found in each file. There is an option to open the files that contain the search matches using nano text editor
+#The script output is provided as a method of learning about cyber security terms, procedures and the like, as prepartion for a job interview, or curiosity
+
+#function takes in URLs from a file and displays them, formatted with space, borders and colors
+#$searchString holds the phrase being searched for within the script
+>>>>>>> 55efbe0... backup 080620
 function getWebLinks()
 {   
     awk -v var="$searchString" 'BEGIN{ 
@@ -40,8 +52,13 @@ do
     DIR="mix"
     if [ ! -d "$DIR" -a "$choice" == 1 ]; then
         # Take action if $DIR does not exist
+<<<<<<< HEAD
         echo "Directory to search does not exist. Press Enter to access main menu and scrape site before searching data"
         #pause to press enter and return to main menu
+=======
+        echo "Directory to search does not exist. Press Enter to access main menu and scrape site"
+        #press enter and return to main menu
+>>>>>>> 55efbe0... backup 080620
         read
         continue
     fi
@@ -52,7 +69,11 @@ do
         while true
             do
             #Read in the search string from the keyboard 
+<<<<<<< HEAD
             read -p "Press enter to quit, or input search phrase and press Enter  e.g ddos attack e.g ddos : " searchString
+=======
+            read -p "Press enter to quit, or input search phrase and press Enter : " searchString
+>>>>>>> 55efbe0... backup 080620
             #if 'enter' is pressed, exit the program
             if [ "$searchString" == "" ]; then break; fi 
             #search all documents in 'mix/text' for the search string. In color for display. -r recursive -i ignore case -a treat binary files as text. nl add line numbers
@@ -73,6 +94,7 @@ do
             #If there were no search matches, return to the beginning of the script and try again, 
             #otherwise open a file in which the search phrase was found by entering its linenumber 
             if [ "$lineCount" == 0 ]; then echo -e "\e[31mNo results found\e[0m"; continue; fi
+<<<<<<< HEAD
             
             #set lineNumber to a numeral so that while loop is entered
             lineNumber=1
@@ -102,6 +124,29 @@ do
               
                 fi
             done
+=======
+            #Read in from the keyboard the line number of the document to be read
+                echo 
+                read -p "enter line number to read document or any other key to display weblinks and continue search: " lineNumber
+            #if the variable is a numeral allow checing of its numeric value, otherwise display weblinks and return to start of script
+            if [ -n "$lineNumber" ] && [ "$lineNumber" -eq "$lineNumber" ] 2>/dev/null
+                then
+                    #if the lineNumber is equal to or less than the lineCount, open file for viewing
+                    if [ "$lineNumber" -lt "$lineCount" -o "$lineNumber" == "$lineCount"  ]; then
+                        #remove all content from file except the line with the data to be read 
+                        sed -i "${lineNumber}q;d" searchData 
+                        #delete out the first field after the colon
+                        cut -d: -f1 searchData > searchData2
+                        #cut the blank space at front of line
+                        cut --complement -c1-6 searchData2 > searchData3
+                        #cat $(cat searchData3);
+                        #open file for reading
+                        nano $(cat searchData3); 
+                    elif [ "$lineNumber" -gt "$lineCount" ]; then  echo "Number too high. Document does not exist"; 
+                    fi
+                
+            fi
+>>>>>>> 55efbe0... backup 080620
             #Show weblinks related to the search phrase
             getWebLinks            
         done
