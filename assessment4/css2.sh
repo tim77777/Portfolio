@@ -3,12 +3,38 @@
 #converted text files. An option is provided to search the converted text files for string matches such as “DDoS” and “threat actor”. When a match is 
 #found the hosting file name is displayed along with the line/s of text containing the string and a reference line number. The amount of matching lines gives 
 #an indication of the value of that document in learning about the search phrase. Entering the reference line number opens the hosting file in a text editor for reading. 
-#Further script action shows the URL associated with the document along with a number showing the frequency of hits for the search phrase for that URL.  This also therefore 
-#gives an indication of the value of the URL in learning about the search phrase. The URL provides a better display for reading the information than a text editor, 
-#including viewing of images if provided. #The script relies on the installation of html2text, curl, wget and nano. 
+#Further script action shows the URL associated with the document along with a number showing the frequency of hits for the search phrase for that URL.  This gives 
+# an indication of the value of the URL in learning about the search phrase. The URL provides a better display for reading the information than a text editor, 
+#including viewing of images if provided. 
+#The script relies on the installation of html2text, curl and nano. 
+
+#function checkPrereqs() checks to see if the prerequisite programs are installed (html2text; curl and nano
+function checkPrereqs()
+{
+    #command returns exit status of 0 if the command exists, or 1 otherwise. redirect to null to prevent screen display    
+    command -v html2text > /dev/null
+        if [ $? == 1 ]; then read  -p "html2text appears to not be installed. Press 'Enter' to exit or any other key and 'Enter', to continue " prereqs
+            #exit the script if enter is pressed otherwise continue
+            if [ "$prereqs" == "" ]
+            then break 
+            fi 
+        fi
+    command -v curl > /dev/null   
+    if [ $? == 1 ]; then read  -p "Curl appears to not be installed. Press 'Enter' to exit or any other key and 'Enter', to continue " prereqs
+            if [ "$prereqs" == "" ]
+            then break 
+            fi 
+        fi
+    command -v nano > /dev/null
+    if [ $? == 1 ]; then read  -p "Nano appears to not be installed. Press 'Enter' to exit or any other key and 'Enter', to continue " prereqs
+            if [ "$prereqs" == "" ]
+            then break 
+            fi 
+        fi    
+}
 
 #function 'getWebLInks' takes in URLs from a file and displays them, formatted with space, borders and colors
-#$searchString holds the phrase being searched for and LInks2 contains the URLs to which matches were found 
+#$searchString holds the phrase being searched for and Links2 contains the URLs to which matches were found 
 function getWebLinks()
 {   
     awk -v var="$searchString" 'BEGIN{ 
@@ -26,8 +52,11 @@ function getWebLinks()
 }
 #The file links2, above, holds names of URLS that the search prhase is found in, as well as the frequency of the search phrase match for each URL
 
+
 while true
 do
+    #check that prerequisite programs are installed
+    checkPrereqs
     #clear the screen and show the main menu
     clear
     echo -e "\e[33mMAIN MENU\e[0m" 
@@ -40,13 +69,13 @@ do
     DIR="mix"
     if [ ! -d "$DIR" -a "$choice" == 1 ]; then
         # Take action if $DIR does not exist
-        echo "Directory to search does not exist. Press Enter to access main menu and scrape site before searching data"
+        echo "Directory to search does not exist. Press Enter to return to  main menu and scrape site before searching data"
         #pause to press enter and return to main menu
         read
         continue
     fi
     #exit from main menu if enter is pressed
-    if [ "$choice" == "" ]; then break; 
+    if [ "$choice" == "" ]; then break;         
 #Search scraped data   
     elif [ "$choice" == 1 ]; then 
         while true
@@ -108,7 +137,7 @@ do
 
 #scrape site
     elif [ "$choice" == 2 ]; then 
-    #Scrapes a selection of HTML data from www.cyber.gov.au, converts it to text and saves it for later use
+    #Scrapes a selection of HTML data from www.cyber.gov.au, converts it to text and saves it for searching
 
         # Download HTML files from various www.cyber.gov.au pages, covert to text and store them
         for x in news advice programs threats publications #ism reportcyber covid-19
@@ -120,23 +149,33 @@ do
             while read -r urls  
             do  #remove the FQDN for each line in urls.txt, leaving only the name of the file
                 publicationNames=$(basename "$urls")
-                #Download the html file at each URL in urls.txt and put it in a directory named with its origin page (i.e. news, advice etc)
-                #-N prevents overwrite if the timestamps match between download files and existing local files
-                wget -N --no-hsts -P ./mix/html/$x/ "$urls" 
-                #Make a directory to place 'html to text' files. A directory is named with its origin page (i.e. news, advice etc)
+                #Make a directory to place html files. A directory is named with its origin page (i.e. news, advice etc). -p creates the whole hierarchcy 
+                mkdir -p `echo ./mix/html/$x`
+                #Download the html file at each URL listed in urls.txt and put it in a directory named with its origin page (i.e. news, advice etc) and original file name
+                #Also filter all java script from html as it is downloaded
+                curl "$urls" | sed 's/<script>.*<\/script>//g;/<script>/,/<\/script>/{/<script>/!{/<\/script>/!d}};s/<script>.*//g;s/.*<\/script>//g;s/<script.*//g' > mix/html/$x/$publicationNames
+                #Make a directory to place 'html to text' files. A directory is named with its origin page (i.e. news, advice etc). -p creates the whole hierarchcy 
                 mkdir -p `echo ./mix/text/$x`
-                #convert downloaded html files to text files using utf8 format, remove irrelevant information from start and finish of text file and store in relative directory
+                #convert downloaded html files to text files using utf8 format, remove irrelevant information from start and finish of text file and store in relevant directory
                 html2text -utf8  ./mix/html/$x/$publicationNames | sed -n '/1. /,$p' | sed -n '/Need help/q;p' > ./mix/text/$x/$publicationNames
             done < urls.txt
         done
 
-        #Comments are the same as above, but the ISM web page has different HTML and so 'grep "hreflang"' as used for the previous scrapes is not relevant and has been replaced with grep "href=\"\/ism\/"
+        #Get all the URLs from ism page. Find the line at each URL with the string on each page with the string "href=\"\/ism\/" and replace it 
+        #with www.cyber.gov.au, and delete  everything after " href. This leaves only the URL which is directed into urls.txt
         curl https://www.cyber.gov.au/ism | grep "href=\"\/ism\/" | sed "s/^.*href=\"/https\:\/\/www.cyber.gov.au/" | sed "s/\">.*//" > urls.txt 
         while read -r urls  
         do
+            #remove the FQDN for each line in urls.txt, leaving only the name of the file
             publicationNames=$(basename "$urls")
-            wget -N --no-hsts -P ./mix/html/ism/ "$urls" 
+            #Make a directory to place html files. -p creates the whole hierarchcy 
+            mkdir -p `echo ./mix/html/ism`
+            #Download the html file at each URL listed in urls.txt and put it in the ism directory with the original file name
+            #Also filter all java script from html as it is downloaded
+            curl "$urls" | sed 's/<script>.*<\/script>//g;/<script>/,/<\/script>/{/<script>/!{/<\/script>/!d}};s/<script>.*//g;s/.*<\/script>//g;s/<script.*//g' > mix/html/ism/$publicationNames
+            #Make a directory to place 'html to text' files.
             mkdir -p `echo ./mix/text/ism`
+            #convert downloaded html files to text files using utf8 format, remove irrelevant information from start and finish of text file and store in relevant directory
             html2text -utf8  ./mix/html/ism/$publicationNames | sed -n '/1. /,$p' | sed -n '/Need help/q;p' > ./mix/text/ism/$publicationNames
         done < urls.txt
         #notifiy that scrape is completed and wait for key press to return to main menu
@@ -145,3 +184,4 @@ do
     else break
     fi
 done
+
