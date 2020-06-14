@@ -1,11 +1,14 @@
 #!/bin/bash
+#set text color to green
 tput setaf 2
 
+#ask for password
 ./passwordCheck.sh
+#if the exit status from passwordCheck is 0, provide access to the menu
 if [ $? == 0 ]
 then 
 while :
-    do        
+    do  #Menu structure with colors      
         echo -e "\e[34m1. create a folder\e[0m" 
         echo -e "\e[34m2. copy a folder\e[0m" 
         echo -e "\e[34m3. set a password\e[0m" 
@@ -16,6 +19,7 @@ while :
         echo -e "\e[31m8. Exit menu\e[0m"
         read -p 'Enter your choice ' choice
     
+        #compare the menu choice with a range of matching possibilities and run the scripts in the selected choice
         case $choice in
             1)
             ..week2/foldermaker.sh
