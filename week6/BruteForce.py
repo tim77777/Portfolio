@@ -2,7 +2,7 @@
 import hashlib
 from itertools import product
 #Parts of code derived from code provided by author: Thijs van Dien
-#https://stackoverflow.com/questions/47952987/how-to-make-all-of-the-permutations-of-a-password-for-brute-force
+#https://stackoverflow.com/questions/47952987/how-to-make-all-of-the-permutations-of-a-password-for-brute-force retrieved May 2020
 #Hashes used for testing
 #passwordHash = "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824" #hello
 #passwordHash = "807172cb27fffa2985bb5097ff31c1ec16d6b657eff07d49744e3a0b3e571a8b" #helloh
